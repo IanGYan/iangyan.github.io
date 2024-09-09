@@ -35,17 +35,17 @@
 
     <!-- OpenGraph -->
  
-    <meta name="description" content="作者： Eugene Yan, Bryan Bischof, Charles Frye, Hamel Husain, Jason Liu &amp; Shreya Shankar 翻译：ian 原作发布日期：May 28, 2024  [Info] 第三次校译稿说明 此文是经验丰富的大语言模型的实践者们毫无保留的分享，具有极高的参考价值。 第一稿译文经 Deepseek V2 翻译，但是大量专业术">
+    <meta name="description" content="作者： Eugene Yan, Bryan Bischof, Charles Frye, Hamel Husain, Jason Liu &amp; Shreya Shankar 翻译：ian 原作发布日期：May 28, 2024  第三次校译稿说明 此文是经验丰富的大语言模型的实践者们毫无保留的分享，具有极高的参考价值。 第一稿译文经 Deepseek V2 翻译，但是大量专业术语翻译有误，语">
 <meta property="og:type" content="article">
 <meta property="og:title" content="LLMs应用构建一年之心得（第一篇）">
 <meta property="og:url" content="https://iangyan.github.io/2024/09/08/building-with-llms-part-1/index.html">
 <meta property="og:site_name" content="Mustard Garden">
-<meta property="og:description" content="作者： Eugene Yan, Bryan Bischof, Charles Frye, Hamel Husain, Jason Liu &amp; Shreya Shankar 翻译：ian 原作发布日期：May 28, 2024  [Info] 第三次校译稿说明 此文是经验丰富的大语言模型的实践者们毫无保留的分享，具有极高的参考价值。 第一稿译文经 Deepseek V2 翻译，但是大量专业术">
+<meta property="og:description" content="作者： Eugene Yan, Bryan Bischof, Charles Frye, Hamel Husain, Jason Liu &amp; Shreya Shankar 翻译：ian 原作发布日期：May 28, 2024  第三次校译稿说明 此文是经验丰富的大语言模型的实践者们毫无保留的分享，具有极高的参考价值。 第一稿译文经 Deepseek V2 翻译，但是大量专业术语翻译有误，语">
 <meta property="og:locale">
-<meta property="og:image" content="https://iangyan.github.io/2024/09/08/building-with-llms-part-1/building-with-llms-part-1/pic1.png">
-<meta property="og:image" content="https://iangyan.github.io/2024/09/08/building-with-llms-part-1/building-with-llms-part-1/pic2.png">
+<meta property="og:image" content="https://github.com/IanGYan/iangyan.github.io/tree/main/2024/09/08/building-with-llms-part-1/pic1.png">
+<meta property="og:image" content="https://github.com/IanGYan/iangyan.github.io/tree/main/2024/09/08/building-with-llms-part-1/pic2.png">
 <meta property="article:published_time" content="2024-09-08T03:10:31.000Z">
-<meta property="article:modified_time" content="2024-09-09T05:46:15.080Z">
+<meta property="article:modified_time" content="2024-09-09T06:25:52.155Z">
 <meta property="article:author" content="ian">
 <meta property="article:tag" content="LLM">
 <meta property="article:tag" content="Prompt Engineering">
@@ -55,7 +55,7 @@
 <meta property="article:tag" content="Agent">
 <meta property="article:tag" content="Finetune">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://iangyan.github.io/2024/09/08/building-with-llms-part-1/building-with-llms-part-1/pic1.png">
+<meta name="twitter:image" content="https://github.com/IanGYan/iangyan.github.io/tree/main/2024/09/08/building-with-llms-part-1/pic1.png">
 
 
     
@@ -154,15 +154,29 @@
 </div>
 
 
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%98%E6%9C%AF%E7%AF%87"><span class="toc-text"> 战术篇</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E7%A4%BA-prompting"><span class="toc-text"> 提示 (Prompting)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%93%E6%B3%A8%E4%BA%8E%E4%BB%8E%E5%9F%BA%E6%9C%AC%E6%8F%90%E7%A4%BA%E6%8A%80%E5%B7%A7%E4%B8%AD%E8%8E%B7%E5%BE%97%E6%9C%80%E5%A4%A7%E6%94%B6%E7%9B%8A"><span class="toc-text"> 专注于从基本提示技巧中获得最大收益</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA"><span class="toc-text"> 结构化输入和输出</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%9A%E5%A5%BD%E4%B8%80%E4%BB%B6%E4%BA%8B%E4%B8%94%E5%8F%AA%E5%81%9A%E4%B8%80%E4%BB%B6%E4%BA%8B%E7%9A%84%E5%B0%8F%E7%9A%84%E6%8F%90%E7%A4%BA"><span class="toc-text"> 做好一件事且只做一件事的小的提示</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B2%BE%E5%BF%83%E8%AE%BE%E8%AE%A1%E4%B8%8A%E4%B8%8B%E6%96%87token"><span class="toc-text"> 精心设计上下文Token</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E6%81%AF%E6%A3%80%E7%B4%A2rag"><span class="toc-text"> 信息检索&#x2F;RAG</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#rag-%E8%BE%93%E5%87%BA%E7%9A%84%E8%B4%A8%E9%87%8F%E5%8F%96%E5%86%B3%E4%BA%8E%E6%96%87%E6%A1%A3%E6%A3%80%E7%B4%A2%E7%9A%84%E8%B4%A8%E9%87%8F%E8%BF%99%E5%8F%88%E5%8F%AF%E4%BB%A5%E8%80%83%E8%99%91%E5%87%A0%E4%B8%AA%E5%9B%A0%E7%B4%A0"><span class="toc-text"> RAG 输出的质量取决于文档检索的质量，这又可以考虑几个因素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8D%E8%A6%81%E5%BF%98%E8%AE%B0%E5%85%B3%E9%94%AE%E8%AF%8D%E6%90%9C%E7%B4%A2%E5%B0%86%E5%85%B6%E4%BD%9C%E4%B8%BA%E5%9F%BA%E7%BA%BF%E5%92%8C%E6%B7%B7%E5%90%88%E6%90%9C%E7%B4%A2%E4%BD%BF%E7%94%A8"><span class="toc-text"> 不要忘记关键词搜索；将其作为基线和混合搜索使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rag%E4%BC%98%E5%85%88%E8%80%8C%E9%9D%9E%E5%BE%AE%E8%B0%83%E4%BB%A5%E8%8E%B7%E5%8F%96%E6%96%B0%E7%9F%A5%E8%AF%86"><span class="toc-text"> RAG优先，而非微调以获取新知识</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%95%BF%E4%B8%8A%E4%B8%8B%E6%96%87%E6%A8%A1%E5%9E%8B%E4%B8%8D%E4%BC%9A%E4%BD%BF-rag-%E8%BF%87%E6%97%B6"><span class="toc-text"> 长上下文模型不会使 RAG 过时</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E6%95%B4%E5%92%8C%E4%BC%98%E5%8C%96%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="toc-text"> 调整和优化工作流</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E6%AD%A5-%E5%A4%9A%E8%BD%AE%E7%9A%84%E6%B5%81%E7%A8%8B%E5%8F%AF%E4%BB%A5%E5%B8%A6%E6%9D%A5%E5%B7%A8%E5%A4%A7%E7%9A%84%E6%8F%90%E5%8D%87"><span class="toc-text"> 分步、多轮的“流程”可以带来巨大的提升</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%97%B6%E9%97%B4%E4%BC%98%E5%85%88%E8%80%83%E8%99%91%E7%A1%AE%E5%AE%9A%E6%80%A7%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="toc-text"> 第一时间优先考虑确定性工作流</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E6%B8%A9%E5%BA%A6%E4%BB%A5%E5%A4%96%E7%9A%84%E5%85%B6%E4%BB%96%E6%96%B9%E5%BC%8F%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A4%9A%E6%A0%B7%E5%8C%96%E7%9A%84%E8%BE%93%E5%87%BA"><span class="toc-text"> 通过温度以外的其他方式获得更多样化的输出</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%93%E5%AD%98caching%E8%A2%AB%E4%BD%8E%E4%BC%B0%E4%BA%86"><span class="toc-text"> 缓存（Caching）被低估了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%95%E6%97%B6%E8%BF%9B%E8%A1%8C%E5%BE%AE%E8%B0%83"><span class="toc-text"> 何时进行微调</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%84%E4%BC%B0%E4%B8%8E%E7%9B%91%E6%8E%A7"><span class="toc-text"> 评估与监控</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E%E5%AE%9E%E9%99%85%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E6%A0%B7%E6%9C%AC%E5%88%9B%E5%BB%BA%E4%B8%80%E4%BA%9B%E5%9F%BA%E4%BA%8E%E6%96%AD%E8%A8%80%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95"><span class="toc-text"> 从实际输入&#x2F;输出样本创建一些基于断言的单元测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#llm-as-judge-%E6%9C%89%E7%82%B9%E5%84%BF%E4%BD%9C%E7%94%A8%E4%BD%86%E5%AE%83%E4%B8%8D%E6%98%AF%E9%93%B6%E5%BC%B9"><span class="toc-text"> LLM-as-Judge 有（点儿）作用，但它不是银弹</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%92%88%E5%AF%B9%E8%AF%84%E4%BC%B0%E7%94%9F%E6%88%90%E7%9A%84%E5%AE%9E%E4%B9%A0%E7%94%9F%E6%B5%8B%E8%AF%95"><span class="toc-text"> 针对评估生成的“实习生测试”</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%87%E5%BA%A6%E5%BC%BA%E8%B0%83%E6%9F%90%E4%BA%9B%E8%AF%84%E4%BC%B0%E5%8F%AF%E8%83%BD%E4%BC%9A%E6%8D%9F%E5%AE%B3%E6%95%B4%E4%BD%93%E6%80%A7%E8%83%BD"><span class="toc-text"> 过度强调某些评估可能会损害整体性能</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E5%8C%96%E6%A0%87%E6%B3%A8%E4%B8%BA%E4%BA%8C%E5%85%83%E4%BB%BB%E5%8A%A1%E6%88%96%E6%88%90%E5%AF%B9%E6%AF%94%E8%BE%83"><span class="toc-text"> 简化标注为二元任务或成对比较</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%A0%E5%8F%82%E8%80%83%E8%AF%84%E4%BC%B0%E5%92%8C%E6%8A%A4%E6%A0%8F%E5%8F%AF%E4%BB%A5%E4%BA%92%E6%8D%A2%E4%BD%BF%E7%94%A8"><span class="toc-text"> （无参考）评估和护栏可以互换使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#llm%E4%BC%9A%E5%9C%A8%E4%B8%8D%E5%BA%94%E8%AF%A5%E7%9A%84%E6%97%B6%E5%80%99%E8%BF%94%E5%9B%9E%E8%BE%93%E5%87%BA"><span class="toc-text"> LLM会在不应该的时候返回输出</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B9%BB%E8%A7%89%E6%98%AF%E4%B8%80%E4%B8%AA%E9%A1%BD%E5%9B%BA%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text"> 幻觉是一个顽固的问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E4%BD%9C%E8%80%85"><span class="toc-text"> 关于作者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%81%94%E7%B3%BB%E6%88%91%E4%BB%AC"><span class="toc-text"> 联系我们</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%B4%E8%B0%A2"><span class="toc-text"> 致谢</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">Article Directory</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%98%E6%9C%AF%E7%AF%87"><span class="toc-text"> 战术篇</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E7%A4%BA-prompting"><span class="toc-text"> 提示 (Prompting)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%93%E6%B3%A8%E4%BA%8E%E4%BB%8E%E5%9F%BA%E6%9C%AC%E6%8F%90%E7%A4%BA%E6%8A%80%E5%B7%A7%E4%B8%AD%E8%8E%B7%E5%BE%97%E6%9C%80%E5%A4%A7%E6%94%B6%E7%9B%8A"><span class="toc-text"> 专注于从基本提示技巧中获得最大收益</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E5%8C%96%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA"><span class="toc-text"> 结构化输入和输出</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%81%9A%E5%A5%BD%E4%B8%80%E4%BB%B6%E4%BA%8B%E4%B8%94%E5%8F%AA%E5%81%9A%E4%B8%80%E4%BB%B6%E4%BA%8B%E7%9A%84%E5%B0%8F%E7%9A%84%E6%8F%90%E7%A4%BA"><span class="toc-text"> 做好一件事且只做一件事的小的提示</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B2%BE%E5%BF%83%E8%AE%BE%E8%AE%A1%E4%B8%8A%E4%B8%8B%E6%96%87token"><span class="toc-text"> 精心设计上下文Token</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E6%81%AF%E6%A3%80%E7%B4%A2rag"><span class="toc-text"> 信息检索&#x2F;RAG</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#rag-%E8%BE%93%E5%87%BA%E7%9A%84%E8%B4%A8%E9%87%8F%E5%8F%96%E5%86%B3%E4%BA%8E%E6%96%87%E6%A1%A3%E6%A3%80%E7%B4%A2%E7%9A%84%E8%B4%A8%E9%87%8F%E8%BF%99%E5%8F%88%E5%8F%AF%E4%BB%A5%E8%80%83%E8%99%91%E5%87%A0%E4%B8%AA%E5%9B%A0%E7%B4%A0"><span class="toc-text"> RAG 输出的质量取决于文档检索的质量，这又可以考虑几个因素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8D%E8%A6%81%E5%BF%98%E8%AE%B0%E5%85%B3%E9%94%AE%E8%AF%8D%E6%90%9C%E7%B4%A2%E5%B0%86%E5%85%B6%E4%BD%9C%E4%B8%BA%E5%9F%BA%E7%BA%BF%E5%92%8C%E6%B7%B7%E5%90%88%E6%90%9C%E7%B4%A2%E4%BD%BF%E7%94%A8"><span class="toc-text"> 不要忘记关键词搜索；将其作为基线和混合搜索使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rag%E4%BC%98%E5%85%88%E8%80%8C%E9%9D%9E%E5%BE%AE%E8%B0%83%E4%BB%A5%E8%8E%B7%E5%8F%96%E6%96%B0%E7%9F%A5%E8%AF%86"><span class="toc-text"> RAG优先，而非微调以获取新知识</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%95%BF%E4%B8%8A%E4%B8%8B%E6%96%87%E6%A8%A1%E5%9E%8B%E4%B8%8D%E4%BC%9A%E4%BD%BF-rag-%E8%BF%87%E6%97%B6"><span class="toc-text"> 长上下文模型不会使 RAG 过时</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E6%95%B4%E5%92%8C%E4%BC%98%E5%8C%96%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="toc-text"> 调整和优化工作流</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E6%AD%A5-%E5%A4%9A%E8%BD%AE%E7%9A%84%E6%B5%81%E7%A8%8B%E5%8F%AF%E4%BB%A5%E5%B8%A6%E6%9D%A5%E5%B7%A8%E5%A4%A7%E7%9A%84%E6%8F%90%E5%8D%87"><span class="toc-text"> 分步、多轮的“流程”可以带来巨大的提升</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%97%B6%E9%97%B4%E4%BC%98%E5%85%88%E8%80%83%E8%99%91%E7%A1%AE%E5%AE%9A%E6%80%A7%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="toc-text"> 第一时间优先考虑确定性工作流</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E6%B8%A9%E5%BA%A6%E4%BB%A5%E5%A4%96%E7%9A%84%E5%85%B6%E4%BB%96%E6%96%B9%E5%BC%8F%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A4%9A%E6%A0%B7%E5%8C%96%E7%9A%84%E8%BE%93%E5%87%BA"><span class="toc-text"> 通过温度以外的其他方式获得更多样化的输出</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%93%E5%AD%98caching%E8%A2%AB%E4%BD%8E%E4%BC%B0%E4%BA%86"><span class="toc-text"> 缓存（Caching）被低估了</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%95%E6%97%B6%E8%BF%9B%E8%A1%8C%E5%BE%AE%E8%B0%83"><span class="toc-text"> 何时进行微调</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%84%E4%BC%B0%E4%B8%8E%E7%9B%91%E6%8E%A7"><span class="toc-text"> 评估与监控</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E%E5%AE%9E%E9%99%85%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E6%A0%B7%E6%9C%AC%E5%88%9B%E5%BB%BA%E4%B8%80%E4%BA%9B%E5%9F%BA%E4%BA%8E%E6%96%AD%E8%A8%80%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95"><span class="toc-text"> 从实际输入&#x2F;输出样本创建一些基于断言的单元测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#llm-as-judge-%E6%9C%89%E7%82%B9%E5%84%BF%E4%BD%9C%E7%94%A8%E4%BD%86%E5%AE%83%E4%B8%8D%E6%98%AF%E9%93%B6%E5%BC%B9"><span class="toc-text"> LLM-as-Judge 有（点儿）作用，但它不是银弹</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%92%88%E5%AF%B9%E8%AF%84%E4%BC%B0%E7%94%9F%E6%88%90%E7%9A%84%E5%AE%9E%E4%B9%A0%E7%94%9F%E6%B5%8B%E8%AF%95"><span class="toc-text"> 针对评估生成的“实习生测试”</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%87%E5%BA%A6%E5%BC%BA%E8%B0%83%E6%9F%90%E4%BA%9B%E8%AF%84%E4%BC%B0%E5%8F%AF%E8%83%BD%E4%BC%9A%E6%8D%9F%E5%AE%B3%E6%95%B4%E4%BD%93%E6%80%A7%E8%83%BD"><span class="toc-text"> 过度强调某些评估可能会损害整体性能</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E5%8C%96%E6%A0%87%E6%B3%A8%E4%B8%BA%E4%BA%8C%E5%85%83%E4%BB%BB%E5%8A%A1%E6%88%96%E6%88%90%E5%AF%B9%E6%AF%94%E8%BE%83"><span class="toc-text"> 简化标注为二元任务或成对比较</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%A0%E5%8F%82%E8%80%83%E8%AF%84%E4%BC%B0%E5%92%8C%E6%8A%A4%E6%A0%8F%E5%8F%AF%E4%BB%A5%E4%BA%92%E6%8D%A2%E4%BD%BF%E7%94%A8"><span class="toc-text"> （无参考）评估和护栏可以互换使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#llm%E4%BC%9A%E5%9C%A8%E4%B8%8D%E5%BA%94%E8%AF%A5%E7%9A%84%E6%97%B6%E5%80%99%E8%BF%94%E5%9B%9E%E8%BE%93%E5%87%BA"><span class="toc-text"> LLM会在不应该的时候返回输出</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B9%BB%E8%A7%89%E6%98%AF%E4%B8%80%E4%B8%AA%E9%A1%BD%E5%9B%BA%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text"> 幻觉是一个顽固的问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E4%BD%9C%E8%80%85"><span class="toc-text"> 关于作者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%81%94%E7%B3%BB%E6%88%91%E4%BB%AC"><span class="toc-text"> 联系我们</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%B4%E8%B0%A2"><span class="toc-text"> 致谢</span></a></li></ol>
+    </div>
 
-<article class="post content-card">
+
+<article class="post post__with-toc content-card">
     <div class="post__header"></div>
     <div class="post__content">
         <p>作者： <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/eugene-yan/">Eugene Yan</a>, <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/bryan-bischof/">Bryan Bischof</a>, <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/charles-frye/">Charles Frye</a>, <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/hamel-husain/">Hamel Husain</a>, <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/jason-liu/">Jason Liu</a> &amp; <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/shreya-shankar/">Shreya Shankar</a><br />
 翻译：ian<br />
 原作发布日期：May 28, 2024</p>
 <blockquote>
-<p>[Info]</p>
 <p><strong>第三次校译稿说明</strong></p>
 <p>此文是经验丰富的大语言模型的实践者们毫无保留的分享，具有极高的参考价值。</p>
 <p>第一稿译文经 Deepseek V2 翻译，但是大量专业术语翻译有误，语叙不畅，阅读困难。此后，译者于空闲时间逐段阅读，并校正了大部分译文，尽量做到能够让读者在不需要对照原文的情况下，也能较为顺畅地以中文阅读本文。</p>
@@ -237,7 +251,6 @@
 <p>考虑到基于 Embedding <sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> 的 RAG 演示如此普遍，人们很容易忘记或忽视信息检索领域几十年来的研究和解决方案。</p>
 <p>尽管 Embedding 无疑是一个强大的工具，但它们并非万能良药。首先，虽然它们擅长捕捉高层次的语义相似性，但在处理更具体的、基于关键词的查询时可能会遇到困难，比如当用户搜索名称（如 Ilya）、缩写词（如 RAG）或 ID（如 claude-3-sonnet）时。基于关键词的搜索，如 BM25，正是为此而设计的。经过多年的基于关键词的搜索使用，用户可能已经习以为常，如果他们期望检索的文档没有被返回，他们可能会感到沮丧。</p>
 <blockquote>
-<p>[Info]</p>
 <p>向量Embedding <em>并不能</em> 神奇地解决搜索问题。事实上，在使用语义相似度搜索进行重新排序之前的步骤才是最重要的。要在 BM25 或全文搜索的基础上实现真正的改进是很困难的。</p>
 <p>— <a target="_blank" rel="noopener" href="http://perplexity.ai/">Aravind Srinivas, Perplexity.ai CEO</a></p>
 <p>我们已经向客户和合作伙伴传达这一信息数月之久。使用简单 Embedding 的最近邻搜索会产生非常嘈杂的结果，你很可能从基于关键词的方法入手会更好。</p>
@@ -253,7 +266,6 @@
 <h4 id="长上下文模型不会使-rag-过时"><a class="markdownIt-Anchor" href="#长上下文模型不会使-rag-过时"></a> 长上下文模型不会使 RAG 过时</h4>
 <p>随着Gemini 1.5提供了高达1000万Token的上下文窗口，一些人开始质疑RAG的未来。</p>
 <blockquote>
-<p>[Info]</p>
 <p>我倾向于认为Gemini 1.5被Sora的过度炒作掩盖了锋芒 <sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup>。1000万Token的上下文窗口实际上使得大多数现有的RAG框架变得不必要——你只需将你的数据放入上下文中，像往常一样与模型对话。想象一下这对所有那些工程努力主要集中在RAG上的初创公司/Agents/LangChain项目会产生什么影响😅 或者用一句话来说：1000万上下文杀死了 RAG。干得漂亮，Gemini。</p>
 <p>— Yao Fu</p>
 </blockquote>
@@ -264,7 +276,6 @@
 <h3 id="调整和优化工作流"><a class="markdownIt-Anchor" href="#调整和优化工作流"></a> 调整和优化工作流</h3>
 <p>提示LLM只是开始。为了榨取它们的最大价值，我们需要超越单个提示，拥抱工作流。例如，我们如何将一个复杂的任务分解为多个简单的任务？何时微调或缓存有助于提高性能和降低延迟或成本？在本节中，我们分享了经过验证的策略和实际案例，帮助你优化和构建可靠的LLM工作流。</p>
 <h4 id="分步-多轮的流程可以带来巨大的提升"><a class="markdownIt-Anchor" href="#分步-多轮的流程可以带来巨大的提升"></a> 分步、多轮的“流程”可以带来巨大的提升</h4>
-<p>We already know that by decomposing a single big prompt into multiple smaller prompts, we can achieve better results. An example of this is <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2401.08500">AlphaCodium</a>: By switching from a single prompt to a multi-step workflow, they increased GPT-4 accuracy (pass@5) on CodeContests from 19% to 44%. The workflow includes:</p>
 <p>我们已经知道，通过将一个大的提示分解为多个较小的提示，我们可以获得更好的结果。一个例子是<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2401.08500">AlphaCodium</a>：通过从单一提示转换为多步骤工作流，他们在CodeContests上将GPT-4的准确率（pass@5）从19%提高到44%。该工作流包括：</p>
 <ul>
 <li>反思问题</li>
@@ -330,7 +341,7 @@
 </ul>
 <p><code>LLM-as-Judge</code>的一个特别强大的应用是检查新提示策略与回归。如果你跟踪了一组生产结果，有时你可以用新的提示策略重新运行这些生产示例，并使用<code>LLM-as-Judge</code>快速评估新策略可能在哪里受到影响。</p>
 <p>这里有一个<a target="_blank" rel="noopener" href="https://hamel.dev/blog/posts/evals/#automated-evaluation-w-llms">简单但有效的方法</a>来迭代<code>LLM-as-Judge</code>，我们只需记录LLM响应、评判者的评判（思维链）和最终结果。然后与利益相关者一起审查这些内容，以确定需要改进的地方。经过三次迭代，人类和LLM的一致性从68%提高到了94%！</p>
-<p><img src="./building-with-llms-part-1/pic1.png" alt="LLM-as-Judge" /></p>
+<p><img src="https://github.com/IanGYan/iangyan.github.io/tree/main/2024/09/08/building-with-llms-part-1/pic1.png" alt="LLM-as-Judge" /></p>
 <p>然而，<code>LLM-as-Judge</code>并非银弹<sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup>。语言中存在一些微妙的方面，即使是最强大的模型也无法可靠地评估。此外，我们发现<a target="_blank" rel="noopener" href="https://eugeneyan.com/writing/finetuning/">传统分类器</a>和奖励模型能够比<code>LLM-as-Judge</code>达到更高的准确率，而且成本和延迟更低。对于代码生成，<code>LLM-as-Judge</code>可能比<code>基于执行的评估</code>等更直接的评估策略更弱。</p>
 <h4 id="针对评估生成的实习生测试"><a class="markdownIt-Anchor" href="#针对评估生成的实习生测试"></a> 针对评估生成的“实习生测试”</h4>
 <p>我们喜欢在评估生成时使用以下“实习生测试”：如果你把语言模型的确切输入，包括上下文，作为一个任务交给相关专业的普通大学生，他们能成功吗？需要多长时间？</p>
@@ -340,14 +351,13 @@
 <p>如果答案是肯定的，他们能很快完成，那就该深入研究数据了。模型做错了什么？我们能找到失败的规律吗？尝试在模型回答前后让它解释自己，这有助于你理解它的思维过程。</p>
 <h4 id="过度强调某些评估可能会损害整体性能"><a class="markdownIt-Anchor" href="#过度强调某些评估可能会损害整体性能"></a> 过度强调某些评估可能会损害整体性能</h4>
 <blockquote>
-<p>[Info]</p>
 <p>“当一个衡量标准成为目标时，它就不再是一个好的衡量标准。”</p>
 <p>—— <em>Goodhart’s Law 古德哈特定律</em></p>
 </blockquote>
 <p>有个例子叫做“大海捞针”（Needle-in-a-Haystack，简称&quot;NIAH&quot;）评估。最初，这个评估有助于量化模型在上下文大小增长时的召回率，以及信息位置对召回率的影响。然而，它被过度强调了，在Gemini 1.5的报告中，被放在了<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2403.05530">图1</a>的位置。NIAH 评估在一个长文档中，重复出现保罗·格雷厄姆的论文，并在其中插入一个特定短语（“The special magic {city} number is: {number}”），然后提示模型去回忆这个魔法数字。</p>
 <p>虽然一些模型实现了近乎完美的召回率，但 NIAH 是否真正反映了现实应用中所需的推理和召回能力却值得质疑。考虑一个更实际的场景：给定一个小时的会议记录，LLM 能否总结关键决策和下一步行动，并正确地将每个项目归于相关人员？这个任务更贴近现实，不仅超越了简单的记忆，还考虑了解析复杂讨论、识别相关信息和综合总结的能力。</p>
 <p>这里有一个<a target="_blank" rel="noopener" href="https://observablehq.com/@shreyashankar/needle-in-the-real-world-experiments">实际的NIAH评估</a>示例。使用<a target="_blank" rel="noopener" href="https://github.com/wyim/aci-bench/tree/main/data/challenge_data">医生-患者视频通话的记录</a>，向LLM询问患者的用药情况。它还包括一个更具挑战性的NIAH，插入一个关于随机披萨配料的短语，例如&quot;<em>制作完美披萨所需的秘密配料是：浸泡咖啡的枣、柠檬和山羊奶酪。</em>&quot;在药物任务上的召回率约为80%，而在披萨任务上约为30%。</p>
-<p><img src="./building-with-llms-part-1/pic2.png" alt="用NIAH评估LLMs" /></p>
+<p><img src="https://github.com/IanGYan/iangyan.github.io/tree/main/2024/09/08/building-with-llms-part-1/pic2.png" alt="用NIAH评估LLMs" /></p>
 <p>顺便说一下，过度强调NIAH评估可能导致在提取和总结任务上的性能下降。因为这些LLM被微调得过于关注每一句话，它们可能会开始将不相关的细节和干扰项视为重要，从而在最终输出中包含它们（而这本不应该发生！）</p>
 <p>这一点对于其他评估和用例也可能是类似的。例如，摘要生成。对事实一致性的强调可能导致摘要不够具体（这样不太可能出现事实不一致的情况），但也可能变得相关性较低。相反，对写作风格和文采的强调可能导致更花哨、更像广告词的语言，这可能引入与事实的不一致。</p>
 <h4 id="简化标注为二元任务或成对比较"><a class="markdownIt-Anchor" href="#简化标注为二元任务或成对比较"></a> 简化标注为二元任务或成对比较</h4>
