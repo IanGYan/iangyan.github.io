@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+
+    
+
+    <!-- 渲染优化 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="HandheldFriendly" content="True" >
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--icon-->
+
+    
+    
+    
+    
+    
+
+
+    <!-- meta -->
+
+
+<title>LLMs应用构建一年之心得（第三篇） | Mustard Garden</title>
+
+
+    <meta name="keywords" content="LLM, Prompt Engineering, RAG, Pipeline, Workflow, Agent, Finetune">
+
+
+
+
+    <!-- OpenGraph -->
+ 
+    <meta name="description" content="作者： Eugene Yan, Bryan Bischof, Charles Frye, Hamel Husain, Jason Liu &amp; Shreya Shankar 原作发布日期：May 31, 2024 翻译：ian 最后修订日期：2024年10月6日 我们之前分享了在运作LLM应用时历经磨练所得的 战术 见解。战术是细粒度的：它们是为实现特定目标而采取的具体行动。我们还分享了我们">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLMs应用构建一年之心得（第三篇）">
+<meta property="og:url" content="https://iangyan.github.io/2024/10/06/building-with-llms-part-3/index.html">
+<meta property="og:site_name" content="Mustard Garden">
+<meta property="og:description" content="作者： Eugene Yan, Bryan Bischof, Charles Frye, Hamel Husain, Jason Liu &amp; Shreya Shankar 原作发布日期：May 31, 2024 翻译：ian 最后修订日期：2024年10月6日 我们之前分享了在运作LLM应用时历经磨练所得的 战术 见解。战术是细粒度的：它们是为实现特定目标而采取的具体行动。我们还分享了我们">
+<meta property="og:locale">
+<meta property="og:image" content="https://iangyan.github.io/2024/10/06/building-with-llms-part-3/models-prices.png">
+<meta property="og:image" content="https://iangyan.github.io/2024/10/06/building-with-llms-part-3/how-it-started.jpg">
+<meta property="article:published_time" content="2024-10-06T15:35:00.000Z">
+<meta property="article:modified_time" content="2024-10-06T15:46:46.350Z">
+<meta property="article:author" content="ian">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="Prompt Engineering">
+<meta property="article:tag" content="RAG">
+<meta property="article:tag" content="Pipeline">
+<meta property="article:tag" content="Workflow">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="Finetune">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://iangyan.github.io/2024/10/06/building-with-llms-part-3/models-prices.png">
+
+
+    
+<link rel="stylesheet" href="/css/style/main.css">
+ 
+
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/css/style/dark.css">
+
+    
+<script src="/js/darkmode.js"></script>
+
+
+
+     
+
+    <!-- custom head -->
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+    <body>
+        <div id="app" tabindex="-1">
+            <header class="header">
+    <div class="header__left">
+        <a href="/" class="button">
+            <span class="logo__text">Mustard Garden</span>
+        </a>
+    </div>
+    <div class="header__right">
+        
+            <div class="navbar__menus">
+                
+                    <a href="/" class="navbar-menu button">首页</a>
+                
+                    <a href="/tags/" class="navbar-menu button">标签</a>
+                
+                    <a href="/archives/" class="navbar-menu button">归档</a>
+                
+            </div>
+        
+        
+        
+    <a href="/search/" id="btn-search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="24" height="24" fill="currentColor" stroke="currentColor" stroke-width="32"><path d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z"></path></svg>
+    </a>
+
+
+        
+        
+    <a href="javaScript:void(0);" id="btn-toggle-dark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </a>
+
+
+        
+            <a class="dropdown-icon button" id="btn-dropdown" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width='24' height='24' fill="none" stroke="currentColor" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M3.314,4.8h13.372c0.41,0,0.743-0.333,0.743-0.743c0-0.41-0.333-0.743-0.743-0.743H3.314c-0.41,0-0.743,0.333-0.743,0.743C2.571,4.467,2.904,4.8,3.314,4.8z M16.686,15.2H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,15.2,16.686,15.2z M16.686,9.257H3.314c-0.41,0-0.743,0.333-0.743,0.743s0.333,0.743,0.743,0.743h13.372c0.41,0,0.743-0.333,0.743-0.743S17.096,9.257,16.686,9.257z"></path></svg></a>
+            <div class="dropdown-menus" id="dropdown-menus">
+                
+                    <a href="/" class="dropdown-menu button">首页</a>
+                
+                    <a href="/tags/" class="dropdown-menu button">标签</a>
+                
+                    <a href="/archives/" class="dropdown-menu button">归档</a>
+                
+            </div>
+        
+    </div>
+</header>
+
+
+            <main class="main">
+    
+
+<div class="post-title">
+    <h1 class="post-title__text">
+        LLMs应用构建一年之心得（第三篇）
+    </h1>
+    <div class="post-title__meta">
+        <a href="/archives/2024/10/" class="post-meta__date button">2024-10-06</a>
+        
+ 
+        
+    
+    
+
+
+ 
+
+ 
+    </div>
+</div>
+
+
+    <aside class="post-side">
+        <div class="post-side__toc">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%98%E7%95%A5%E6%9E%84%E5%BB%BA%E4%B8%8D%E8%A2%AB%E6%B7%98%E6%B1%B0%E7%9A%84llm%E5%BA%94%E7%94%A8"><span class="toc-text"> 战略：构建不被淘汰的LLM应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pmf%E4%B9%8B%E5%89%8D%E4%B8%8D%E9%9C%80%E8%A6%81gpu"><span class="toc-text"> PMF[2]之前不需要GPU</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E8%AE%AD%E7%BB%83%E5%87%A0%E4%B9%8E%E4%BB%8E%E6%9D%A5%E9%83%BD%E4%B8%8D%E5%90%88%E7%90%86"><span class="toc-text"> 从头开始训练（几乎）从来都不合理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8D%E8%A6%81%E5%BE%AE%E8%B0%83%E7%9B%B4%E5%88%B0%E4%BD%A0%E8%AF%81%E6%98%8E%E4%BA%86%E6%9C%89%E5%85%B6%E5%BF%85%E8%A6%81"><span class="toc-text"> 不要微调，直到你证明了有其必要</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E%E6%8E%A8%E7%90%86api%E5%BC%80%E5%A7%8B%E4%BD%86%E4%B8%8D%E8%A6%81%E5%AE%B3%E6%80%95%E8%87%AA%E4%B8%BB%E6%89%98%E7%AE%A1"><span class="toc-text"> 从推理API开始，但不要害怕自主托管</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%AD%E4%BB%A3%E8%87%B3%E5%8D%93%E8%B6%8A"><span class="toc-text"> 迭代至卓越</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E4%B8%8D%E6%98%AF%E4%BA%A7%E5%93%81%E5%9B%B4%E7%BB%95%E5%AE%83%E7%9A%84%E7%B3%BB%E7%BB%9F%E6%89%8D%E6%98%AF"><span class="toc-text"> 模型不是产品；围绕它的系统才是</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%90%E6%AD%A5%E7%A1%AE%E7%AB%8B%E4%BF%A1%E4%BB%BB"><span class="toc-text"> 逐步确立信任</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BAllmops-%E4%B8%BA%E4%BA%86%E6%AD%A3%E7%A1%AE%E7%9A%84%E7%90%86%E7%94%B1%E5%BF%AB%E9%80%9F%E8%BF%AD%E4%BB%A3"><span class="toc-text"> 构建LLMOps —— 为了正确的理由：快速迭代</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%AB%E8%87%AA%E5%B7%B1%E9%80%A0%E9%82%A3%E4%BA%9B%E8%83%BD%E4%B9%B0%E5%88%B0%E7%9A%84llm%E5%8A%9F%E8%83%BD"><span class="toc-text"> 别自己造那些能买到的LLM功能</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ai%E5%8F%82%E4%B8%8E%E5%85%B6%E4%B8%AD%E4%BA%BA%E7%B1%BB%E5%A4%84%E4%BA%8E%E4%B8%AD%E5%BF%83"><span class="toc-text"> AI参与其中；人类处于中心</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E6%8F%90%E7%A4%BA%E8%AF%8D-%E8%AF%84%E4%BC%B0-%E6%95%B0%E6%8D%AE%E6%94%B6%E9%9B%86%E8%B5%B7%E6%AD%A5"><span class="toc-text"> 从提示词、评估、数据收集起步</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%E6%98%AF%E8%B5%B7%E7%82%B9"><span class="toc-text"> 提示工程是起点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA%E8%AF%84%E4%BC%B0%E5%B9%B6%E5%90%AF%E5%8A%A8%E6%95%B0%E6%8D%AE%E9%A3%9E%E8%BD%AE"><span class="toc-text"> 构建评估并启动数据飞轮</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E4%BD%8E%E6%88%90%E6%9C%AC%E8%AE%A4%E7%9F%A5%E7%9A%84%E6%88%98%E7%95%A5%E5%8F%91%E5%B1%95%E8%B6%8B%E5%8A%BF"><span class="toc-text"> 关于低成本认知的战略发展趋势</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8E0%E5%88%B01%E7%9A%84%E6%BC%94%E7%A4%BA%E5%A4%9F%E4%BA%86%E7%8E%B0%E5%9C%A8%E6%98%AF%E6%97%B6%E5%80%99%E6%8E%A8%E5%87%BA1%E5%88%B0n%E7%9A%84%E4%BA%A7%E5%93%81%E4%BA%86"><span class="toc-text"> 从0到1的演示够了，现在是时候推出1到N的产品了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E4%BD%9C%E8%80%85"><span class="toc-text"> 关于作者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%81%94%E7%B3%BB%E6%88%91%E4%BB%AC"><span class="toc-text"> 联系我们</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%B4%E8%B0%A2"><span class="toc-text"> 致谢</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%91%E6%B3%A8"><span class="toc-text"> 译注</span></a></li></ol>
+        </div>
+    </aside>
+    <a class="btn-toc button" id="btn-toc" tabindex="0">
+        <svg viewBox="0 0 1024 1024" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M128 256h64V192H128zM320 256h576V192H320zM128 544h64v-64H128zM320 544h576v-64H320zM128 832h64v-64H128zM320 832h576v-64H320z" fill="currentColor"></path>
+        </svg>
+    </a>
+    <div class="toc-menus" id="toc-menus">
+        <div class="toc-title">Article Directory</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%98%E7%95%A5%E6%9E%84%E5%BB%BA%E4%B8%8D%E8%A2%AB%E6%B7%98%E6%B1%B0%E7%9A%84llm%E5%BA%94%E7%94%A8"><span class="toc-text"> 战略：构建不被淘汰的LLM应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#pmf%E4%B9%8B%E5%89%8D%E4%B8%8D%E9%9C%80%E8%A6%81gpu"><span class="toc-text"> PMF[2]之前不需要GPU</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E8%AE%AD%E7%BB%83%E5%87%A0%E4%B9%8E%E4%BB%8E%E6%9D%A5%E9%83%BD%E4%B8%8D%E5%90%88%E7%90%86"><span class="toc-text"> 从头开始训练（几乎）从来都不合理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8D%E8%A6%81%E5%BE%AE%E8%B0%83%E7%9B%B4%E5%88%B0%E4%BD%A0%E8%AF%81%E6%98%8E%E4%BA%86%E6%9C%89%E5%85%B6%E5%BF%85%E8%A6%81"><span class="toc-text"> 不要微调，直到你证明了有其必要</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E%E6%8E%A8%E7%90%86api%E5%BC%80%E5%A7%8B%E4%BD%86%E4%B8%8D%E8%A6%81%E5%AE%B3%E6%80%95%E8%87%AA%E4%B8%BB%E6%89%98%E7%AE%A1"><span class="toc-text"> 从推理API开始，但不要害怕自主托管</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%AD%E4%BB%A3%E8%87%B3%E5%8D%93%E8%B6%8A"><span class="toc-text"> 迭代至卓越</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A8%A1%E5%9E%8B%E4%B8%8D%E6%98%AF%E4%BA%A7%E5%93%81%E5%9B%B4%E7%BB%95%E5%AE%83%E7%9A%84%E7%B3%BB%E7%BB%9F%E6%89%8D%E6%98%AF"><span class="toc-text"> 模型不是产品；围绕它的系统才是</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%90%E6%AD%A5%E7%A1%AE%E7%AB%8B%E4%BF%A1%E4%BB%BB"><span class="toc-text"> 逐步确立信任</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BAllmops-%E4%B8%BA%E4%BA%86%E6%AD%A3%E7%A1%AE%E7%9A%84%E7%90%86%E7%94%B1%E5%BF%AB%E9%80%9F%E8%BF%AD%E4%BB%A3"><span class="toc-text"> 构建LLMOps —— 为了正确的理由：快速迭代</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%AB%E8%87%AA%E5%B7%B1%E9%80%A0%E9%82%A3%E4%BA%9B%E8%83%BD%E4%B9%B0%E5%88%B0%E7%9A%84llm%E5%8A%9F%E8%83%BD"><span class="toc-text"> 别自己造那些能买到的LLM功能</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ai%E5%8F%82%E4%B8%8E%E5%85%B6%E4%B8%AD%E4%BA%BA%E7%B1%BB%E5%A4%84%E4%BA%8E%E4%B8%AD%E5%BF%83"><span class="toc-text"> AI参与其中；人类处于中心</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E6%8F%90%E7%A4%BA%E8%AF%8D-%E8%AF%84%E4%BC%B0-%E6%95%B0%E6%8D%AE%E6%94%B6%E9%9B%86%E8%B5%B7%E6%AD%A5"><span class="toc-text"> 从提示词、评估、数据收集起步</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%90%E7%A4%BA%E5%B7%A5%E7%A8%8B%E6%98%AF%E8%B5%B7%E7%82%B9"><span class="toc-text"> 提示工程是起点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA%E8%AF%84%E4%BC%B0%E5%B9%B6%E5%90%AF%E5%8A%A8%E6%95%B0%E6%8D%AE%E9%A3%9E%E8%BD%AE"><span class="toc-text"> 构建评估并启动数据飞轮</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E4%BD%8E%E6%88%90%E6%9C%AC%E8%AE%A4%E7%9F%A5%E7%9A%84%E6%88%98%E7%95%A5%E5%8F%91%E5%B1%95%E8%B6%8B%E5%8A%BF"><span class="toc-text"> 关于低成本认知的战略发展趋势</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8E0%E5%88%B01%E7%9A%84%E6%BC%94%E7%A4%BA%E5%A4%9F%E4%BA%86%E7%8E%B0%E5%9C%A8%E6%98%AF%E6%97%B6%E5%80%99%E6%8E%A8%E5%87%BA1%E5%88%B0n%E7%9A%84%E4%BA%A7%E5%93%81%E4%BA%86"><span class="toc-text"> 从0到1的演示够了，现在是时候推出1到N的产品了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E4%BD%9C%E8%80%85"><span class="toc-text"> 关于作者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%81%94%E7%B3%BB%E6%88%91%E4%BB%AC"><span class="toc-text"> 联系我们</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%B4%E8%B0%A2"><span class="toc-text"> 致谢</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%91%E6%B3%A8"><span class="toc-text"> 译注</span></a></li></ol>
+    </div>
+
+
+<article class="post post__with-toc content-card">
+    <div class="post__header"></div>
+    <div class="post__content">
+        <p>作者： <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/eugene-yan/">Eugene Yan</a>, <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/bryan-bischof/">Bryan Bischof</a>, <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/charles-frye/">Charles Frye</a>, <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/hamel-husain/">Hamel Husain</a>, <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/jason-liu/">Jason Liu</a> &amp; <a target="_blank" rel="noopener" href="https://www.oreilly.com/people/shreya-shankar/">Shreya Shankar</a><br />
+原作发布日期：May 31, 2024<br />
+翻译：ian<br />
+最后修订日期：2024年10月6日</p>
+<p>我们<a target="_blank" rel="noopener" href="https://www.oreilly.com/radar/what-we-learned-from-a-year-of-building-with-llms-part-i/">之前分享了</a>在运作LLM应用时历经磨练所得的 <em>战术</em> 见解。战术是细粒度的：它们是为实现特定目标而采取的具体行动。我们<a target="_blank" rel="noopener" href="https://www.oreilly.com/radar/what-we-learned-from-a-year-of-building-with-llms-part-ii/">还分享了</a>我们对 <em>运作</em> 的看法：支持战术工作以实现更高层次目标的流程。</p>
+<p>但这些目标从何而来？这就是 <em>战略</em> 的领域。战略回答了战术和运作背后的&quot;是什么&quot;和&quot;为什么&quot;问题。</p>
+<p>我们提供了一些我们的主张，比如&quot;在达到产品市场契合度之前不要使用GPU&quot;和&quot;专注于系统而非模型&quot;，以帮助团队确定如何分配稀缺资源。我们还建议了一个从迭代到优秀产品的路线图。这最后一组经验教训回答了以下问题：</p>
+<ol>
+<li>自建还是购买：何时应该训练自己的模型，何时应该利用现有的API？答案一如既往是&quot;视情况而定&quot;。我们分享了具体取决于哪些因素。</li>
+<li>迭代到卓越：如何创造持久的竞争优势，而不仅仅是使用最新的模型？我们讨论了构建模型周围强大系统的重要性，以及专注于提供令人难忘、黏性强的体验。</li>
+<li>以人为本的AI：如何有效地将LLM整合到人类工作流程中，以最大化生产力和幸福感？我们强调构建AI工具的重要性，这些工具应支持和增强人类能力，而不是试图完全取代它们。</li>
+<li>起步：对于着手构建LLM产品的团队来说，有哪些基本步骤？我们概述了一个基本的行动方案，从提示工程、评估和数据收集开始。</li>
+<li>低成本认知的未来：LLM成本的快速下降和能力的不断提升将如何塑造AI应用的未来？我们研究了历史趋势，并通过一个简单的方法来估计某些应用何时可能在经济上变得可行。</li>
+<li>从演示到产品：从一个引人注目的演示到一个可靠、可扩展的产品需要什么？我们强调了严格的工程、测试和改进的必要性，以弥合原型和生产之间的差距。</li>
+</ol>
+<p>为了回答这些困难的问题，让我们<em>逐步思考…</em><sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></p>
+<h2 id="战略构建不被淘汰的llm应用"><a class="markdownIt-Anchor" href="#战略构建不被淘汰的llm应用"></a> 战略：构建不被淘汰的LLM应用</h2>
+<p>成功的产品需要深思熟虑的规划和严格的优先级排序，而不是无休止的原型开发或追随最新的模型发布或趋势。在这最后一部分，我们环顾四周，思考构建优秀AI产品的战略考量。我们还研究了团队将面临的关键权衡，比如何时自建、何时购买，并为早期LLM应用开发战略提出一个&quot;行动方案&quot;。</p>
+<h3 id="pmf之前不需要gpu"><a class="markdownIt-Anchor" href="#pmf之前不需要gpu"></a> PMF<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>之前不需要GPU</h3>
+<p>要想成功，你的产品不能仅仅是别人API的一层薄薄的套壳，但反向的错误可能会代价高昂。过去一年，我们也看到了大量风险投资，包括令人瞠目结舌的60亿美元A轮融资，被用于训练和定制模型，却没有明确的产品愿景或目标市场。在本节中，我们将解释为什么立即跳到训练自己的模型是一个错误，并考虑自主托管的作用。</p>
+<h4 id="从头开始训练几乎从来都不合理"><a class="markdownIt-Anchor" href="#从头开始训练几乎从来都不合理"></a> 从头开始训练（几乎）从来都不合理</h4>
+<p>对于大多数组织来说，从头开始预训练LLM是一种不切实际的、偏离构建产品的做法。</p>
+<p>尽管它令人兴奋，而且似乎每个人都在这么做，但开发和维护机器学习基础设施需要大量资源。这包括收集数据、训练和评估模型以及部署它们。如果你仍在验证PMF（产品市场契合度）阶段，这些努力会分散开发核心产品的资源。即使你拥有计算能力、数据和技术实力，预训练的LLM可能在几个月内就会过时。</p>
+<p>考虑<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.17564">BloombergGPT</a>的案例，这是一个专门为金融任务训练的LLM。该模型在363B个标记上进行了预训练，需要<a target="_blank" rel="noopener" href="https://twimlai.com/podcast/twimlai/bloomberggpt-an-llm-for-finance/">九名全职员工</a>的巨大努力，其中四名来自AI工程部门，五名来自ML产品和研究部门。尽管付出了这么多努力，它在一年内就在这些金融任务上被<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2305.05862">gpt-3.5-turbo和gpt-4超越了</a>。</p>
+<p>这个案例和其他类似案例表明，对于大多数实际应用来说，从头开始预训练LLM，即使是在特定领域的数据上，也不是资源的最佳利用。相反，团队最好是对现有的最强大的开源模型进行微调，以满足他们的特定需求。</p>
+<p>当然也有例外。一个出色的例子是<a target="_blank" rel="noopener" href="https://blog.replit.com/replit-code-v1_5">Replit的代码模型</a>，专门为代码生成和理解而训练。通过预训练，Replit能够在性能上超越其他大型模型，如CodeLlama7b。但随着其他越来越强大的模型不断发布，保持其实用性需要持续投资。</p>
+<h4 id="不要微调直到你证明了有其必要"><a class="markdownIt-Anchor" href="#不要微调直到你证明了有其必要"></a> 不要微调，直到你证明了有其必要</h4>
+<p>对于大多数组织来说，微调更多是由于害怕错过（FOMO）而不是清晰的战略思考驱动的。</p>
+<p>不少组织过早地投资于微调，试图打破&quot;只是另一个包装&quot;的指责。事实上，微调是个重型机械，只有在收集了大量令你确信其他方法不足的例子之后才应该部署。</p>
+<p>一年前，许多团队告诉我们他们对微调感到兴奋。后来，很少有团队找到了产品市场契合度，大多数团队后悔他们的决定。如果你要进行微调，你最好真的有信心能够随着基础模型的改进而一次又一次地进行微调 —— 参见下面的&quot;模型不是产品&quot;和&quot;构建LLMOps&quot;部分。</p>
+<p>什么时候微调才是真正正确的选择？如果在用于训练现有模型的大多数开放网络规模的数据集中，没有适用于你的用例需要的数据；并且如果你已经构建了一个最小可行产品（MVP），证明现有模型不足以满足需求 —— 此时，才是选择微调的正确时机。但要小心：如果优质的训练数据对模型构建者来说不容易获得，那么 <em>你</em> 又从哪里获得它呢？</p>
+<p>最终，请记住，由LLM驱动的应用程序并不是科研探索项目；对它们的投资应该与它们对你企业战略目标和竞争优势的贡献相称。</p>
+<h4 id="从推理api开始但不要害怕自主托管"><a class="markdownIt-Anchor" href="#从推理api开始但不要害怕自主托管"></a> 从推理API开始，但不要害怕自主托管</h4>
+<p>有了LLM API，创业公司比以往任何时候都更容易采用和集成语言建模能力，而无需从头开始训练自己的模型。像Anthropic和OpenAI这样的提供商提供通用API，只需几行代码就可以为你的产品注入智能。通过使用这些服务，你可以减少所花费的精力，转而专注于为客户创造价值 —— 这使你能够更快地验证想法并朝着产品市场契合度迭代。</p>
+<p>但是，就像数据库一样，托管服务并不适合每一种用例，尤其是当规模和需求增加时。事实上，自主托管可能是在不将机密/私人数据发送出网络的情况下使用模型的唯一方法，这在医疗保健和金融等受监管行业中是必需的，或者是合同义务或保密要求所要求的。</p>
+<p>此外，自主托管可以绕过推理服务提供商施加的限制，如速率限制、模型弃用和使用限制。另外，自主托管让你对模型有完全的控制权，使得围绕它构建差异化的高质量系统变得更加容易。最后，自主托管，特别是对于微调模型，可以在大规模应用时降低成本。例如，<a target="_blank" rel="noopener" href="https://tech.buzzfeed.com/lessons-learned-building-products-powered-by-generative-ai-7f6c23bff376#9da5">BuzzFeed分享了他们如何通过微调开源LLM将成本降低80%</a>。</p>
+<h3 id="迭代至卓越"><a class="markdownIt-Anchor" href="#迭代至卓越"></a> 迭代至卓越</h3>
+<p>要长期保持竞争优势，你需要超越模型本身，考虑是什么让你的产品与众不同。虽然执行速度很重要，但它不应该是你唯一的优势。</p>
+<h4 id="模型不是产品围绕它的系统才是"><a class="markdownIt-Anchor" href="#模型不是产品围绕它的系统才是"></a> 模型不是产品；围绕它的系统才是</h4>
+<p>对于不构建模型的团队来说，快速的创新步伐是一个福音，因为他们可以从一个最先进的模型迁移到下一个，追求上下文大小、推理能力和价值比的提升，从而构建越来越好的产品。</p>
+<p>这样的进展既令人兴奋又可预测。总的来说，这意味着模型可能是系统中最不持久的组件。</p>
+<p>相反，将你的精力集中在能够提供持久价值的方面，例如：</p>
+<ul>
+<li>评估框架(Evaluation chassis)：可靠地衡量不同模型在你的任务上的表现</li>
+<li>安全护栏(Guardrails)：无论使用哪种模型都能防止不期望的输出</li>
+<li>缓存(Caching)：通过避免完全使用模型来减少延迟和成本</li>
+<li>数据飞轮(Data flywheel)：驱动上述所有方面的迭代改进</li>
+</ul>
+<p>这些组件比原始模型能力创造了一道更厚实的产品质量护城河。</p>
+<p>但这并不意味着在应用层构建是没有风险的。OpenAI或其他模型提供上会顾及企业需求而提供一些功能，不要将你的精力花在解决的同样问题上。</p>
+<p>例如，一些团队投资于构建自定义工具来验证专有模型的结构化输出；在这方面进行最小限度的投资很重要，但深入投资反而浪费时间。OpenAI需要确保当你请求函数调用时，你能得到一个有效的函数调用 —— 因为他们所有的客户都需要这个。在这里采用一些&quot;战略性拖延&quot;，只构建你绝对需要的东西，并等待供应商提供的这显而易见的功能的扩展。</p>
+<h4 id="逐步确立信任"><a class="markdownIt-Anchor" href="#逐步确立信任"></a> 逐步确立信任</h4>
+<p>试图成为一切的产品往往会导致平庸。要创造引人注目的产品，公司需要专注于打造令人难忘、具有粘性的体验，让用户不断回访。</p>
+<p>请看一个旨在回答用户可能提出的任何问题的通用RAG系统：缺乏专业化意味着该系统无法优先处理最新信息、解析特定领域的格式、或理解特定任务的细微差别。结果，用户得到的是一种浅显、不可靠的体验，无法满足他们的需求。</p>
+<p>为了解决这个问题，请专注于特定领域和用例。通过深入而非广泛来缩小范围。这将创造出能引起用户共鸣的特定领域工具。专业化还允许你坦诚地说明系统的能力和局限性。对系统能做什么和不能做什么保持透明，展示了自我意识，帮助用户理解系统在哪里能带来最大价值，从而建立对输出的信任和信心。</p>
+<h4 id="构建llmops-为了正确的理由快速迭代"><a class="markdownIt-Anchor" href="#构建llmops-为了正确的理由快速迭代"></a> 构建LLMOps —— 为了正确的理由：快速迭代</h4>
+<p>DevOps 的本质并不在于可重复的工作流程、左移或赋能两个披萨团队——它绝对不是关于编写 YAML 文件的。</p>
+<p>DevOps 的核心是缩短工作与其成果之间的反馈周期，使改进能够累积而非错误。它的根源可以通过精益创业运动追溯到精益制造和丰田生产系统，强调快速换模和持续改进（Kaizen）<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup>。</p>
+<p>MLOps采用了DevOps的形式应用于机器学习。我们有可重复的实验，有赋能模型构建者进行部署的一体化套件。天哪，我们还有大量的YAML文件。</p>
+<p>但作为一个行业，MLOps并没有继承DevOps的功能。它没有缩短模型及其在生产中的推理和交互之间的反馈差距。</p>
+<p>令人欣慰的是，LLMOps领域已经从纠结于像提示管理这样的小问题转向了那些阻碍迭代发展的难题：生产监控和持续改进，这些都通过评估紧密相连。</p>
+<p>我们已经有了交互式平台，用于中立、众包的聊天和编码模型评估 —— 这是一个集体、迭代改进的外循环。像LangSmith、Log10、LangFuse、W&amp;B Weave、HoneyHive等工具不仅承诺收集和整理生产系统结果的数据，还通过与开发深度集成来利用这些数据改进系统。请拥抱这些工具，或者自己动手打造。</p>
+<h4 id="别自己造那些能买到的llm功能"><a class="markdownIt-Anchor" href="#别自己造那些能买到的llm功能"></a> 别自己造那些能买到的LLM功能</h4>
+<p>大多数成功的企业并非 LLM 企业。同时，大多数企业都有机会通过 LLM 得到改进。</p>
+<p>这对观察结果常常误导领导者仓促地将系统与LLM结合，以增加成本和降低质量的方式推出所谓的“AI”功能，还配上那个<a target="_blank" rel="noopener" href="https://x.com/nearcyan/status/1783351706031718412">令人心生敬畏的Sparkle图标</a><sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup>。其实，有一个更好的方法：专注于真正与你的产品目标一致并能增强核心业务的LLM应用。</p>
+<p>请看几个浪费你团队时间的错误尝试：</p>
+<ul>
+<li>为你的业务构建自定义的text-to-SQL功能</li>
+<li>构建一个聊天机器人来与你的文档对话</li>
+<li>将公司知识库与客户支持聊天机器人集成</li>
+</ul>
+<p>虽然上述内容是LLM应用的入门级示例，但几乎没有任何产品公司有必要自己构建这些功能。这些都是许多企业面临的普遍问题，从令人兴奋的演示到可靠的组件之间存在巨大差距 —— 这通常是软件公司的专属领域。将宝贵的研发资源投入到当前 Y Combinator 批次正在大规模解决的普遍问题上是一种浪费。</p>
+<p>如果这听起来像是陈词滥调的商业建议，那是因为在当前炒作热潮的泡沫中，很容易将任何与“LLM”相关的东西误认为是前沿的差异化优势，而忽视了哪些应用已经成为老生常谈。</p>
+<h4 id="ai参与其中人类处于中心"><a class="markdownIt-Anchor" href="#ai参与其中人类处于中心"></a> AI参与其中；人类处于中心</h4>
+<p>目前，由LLM驱动的应用程序仍然很脆弱。它们需要大量的安全防护和防御性工程，而且仍然难以预测。不过，当范围明确时，这些应用程序可能会非常有用。这意味着LLM是加速用户工作流程的出色工具。</p>
+<p>虽然想象中基于大型语言模型（LLM）的应用完全取代工作流程或替代某个职位很诱人，但今天最有效的范式还是人机结合的&quot;半人马&quot;模式（参见<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Advanced_chess">半人马象棋</a>）。当能力出众的人类与为快速应用而优化的LLM能力相结合时，完成任务的生产力和满足感可大幅提升。LLM的旗舰应用之一，GitHub Copilot就展示了这种工作流程的强大力量：</p>
+<blockquote>
+<p>“总的来说，开发者们告诉我们，相比不使用这些工具，使用GitHub Copilot和GitHub Copilot Chat进行编程时，他们感到更有信心，因为代码变得更简单、更少错误、更易读、更可复用、更简洁、更易维护，也更具韧性。”</p>
+<p>—Mario Rodriguez，GitHub</p>
+</blockquote>
+<p>对于那些长期从事机器学习工作的人来说，你可能会立即想到“human-in-the-loop”的概念，但别急：HITL的机器学习是一种由人类专家确保机器学习模型按预期行为的范式。虽然两者有关联，但我们在这里提出的是一种更加微妙的理念。如今，由LLM驱动的系统不应成为大多数工作流程的主要驱动力；它们应该仅仅作为一种资源存在。</p>
+<p>以人为本，思考如何让大型语言模型支持他们的工作流程，这会带来截然不同的产品设计和决策。最终，这将促使你打造出与那些试图迅速将所有责任推给大型语言模型的竞争对手不同的产品 —— 更好、更有用、风险更低的产品。</p>
+<h3 id="从提示词-评估-数据收集起步"><a class="markdownIt-Anchor" href="#从提示词-评估-数据收集起步"></a> 从提示词、评估、数据收集起步</h3>
+<p>前面的章节提供了大量的技术和建议，信息量很大。让我们考虑一下最基本的有用建议：如果一个团队想要构建一个LLM产品，他们应该从哪里开始？</p>
+<p>在过去的一年里，我们已经看到了足够多的例子，开始有信心认为成功的LLM应用遵循一致的轨迹。我们在本节中将介绍这个基本的&quot;入门&quot;指南。核心理念是从简单开始，只在需要时增加复杂性。一个不错的经验法则是，每一个复杂程度通常需要比前一个至少多一个数量级的努力。考虑到这一点…</p>
+<h4 id="提示工程是起点"><a class="markdownIt-Anchor" href="#提示工程是起点"></a> 提示工程是起点</h4>
+<p>从提示工程开始。使用我们之前在战术部分讨论的所有技巧。思维链、n-shot示例，以及结构化输入和输出几乎总是一个好主意。在尝试从较弱的模型中榨取性能之前，先用最高性能的模型进行原型设计。</p>
+<p>只有在提示工程无法达到所需性能水平时，才应考虑微调。我们也经常遇到一些非功能性需求（例如，数据隐私、完全控制和成本）阻碍我们使用专有模型，从而需要自行托管。而执行微调，仅需确保这些隐私要求不会阻止微调时使用那些用户数据！</p>
+<h4 id="构建评估并启动数据飞轮"><a class="markdownIt-Anchor" href="#构建评估并启动数据飞轮"></a> 构建评估并启动数据飞轮</h4>
+<p>即使是刚刚起步的团队也需要评估。否则，你将无法知道你的提示工程是否足够，或者你的微调模型何时准备好取代基础模型。</p>
+<p>有效的评估是<a target="_blank" rel="noopener" href="https://twitter.com/thesephist/status/1707839140018974776">针对你的特定任务</a>并反映预期使用场景的。我们<a target="_blank" rel="noopener" href="https://hamel.dev/blog/posts/evals/">推荐</a>的第一级评估是单元测试。这些简单的断言可以检测已知或假设的故障模式，并有助于推动早期设计决策。另请参阅其他针对分类、摘要等<a target="_blank" rel="noopener" href="https://eugeneyan.com/writing/evals/">特定任务的评估</a>。</p>
+<p>虽然单元测试和基于模型的评估很有用，但它们并不能取代人工评估的必要性。让人们使用你的模型/产品并提供反馈。这有双重目的：一方面测量实际性能和缺陷率，另一方面收集可用于微调未来模型的高质量标注数据。这创造了一个正反馈循环，或称数据飞轮，随着时间推移会产生复合效应：</p>
+<ul>
+<li>使用人工评估来评估模型性能和/或发现缺陷</li>
+<li>使用标注数据来微调模型或更新提示</li>
+<li>重复以上步骤</li>
+</ul>
+<p>例如，在审核LLM生成的摘要以查找缺陷时，我们可能会对每个句子进行细粒度的反馈标注，识别事实不一致、无关性或不良风格。然后，我们可以使用这些事实不一致的标注来<a target="_blank" rel="noopener" href="https://eugeneyan.com/writing/finetuning/">训练一个幻觉分类器</a>，或使用相关性标注来训练一个<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2009.01325">用于评分相关性的奖励模型</a>。另一个例子是，LinkedIn在其文章中分享了使用<a target="_blank" rel="noopener" href="https://www.linkedin.com/blog/engineering/generative-ai/musings-on-building-a-generative-ai-product">基于模型的评估器</a>来估计幻觉、负责任AI违规、连贯性等方面的成功经验。</p>
+<p>通过创建这样可以随时间推移复合式增值的资产，我们构建的评估将从一个单纯的运营开销升级为一个战略级投资成果，并在此过程中构建出我们的数据飞轮。</p>
+<h3 id="关于低成本认知的战略发展趋势"><a class="markdownIt-Anchor" href="#关于低成本认知的战略发展趋势"></a> 关于低成本认知的战略发展趋势</h3>
+<p>1971年，施乐帕洛阿尔托研究中心（Xerox PARC）的研究人员预见了未来：一个我们现在正在生活的网络化个人电脑世界。他们在使这一切成为可能的技术发明中扮演了关键角色，帮助孕育了这个未来，这些发明从以太网和图形渲染到鼠标和窗口。</p>
+<p>但他们还进行了一个简单的练习：他们观察了一些非常有用（例如，视频显示）但尚未足够经济实惠（足以驱动视频显示所需的RAM成本高达数千美元）的技术应用。然后，他们根据该技术的价格历史趋势（类似于摩尔定律）预测了这些技术何时会变得经济实惠。</p>
+<p>我们可以对LLM技术做同样的事情，尽管我们没有像每个晶体管多少美元这样清晰的指标可以使用。以一个流行的、长期存在的基准为例，比如大规模多任务语言理解数据集，并采用一致的输入方法（五轮示例提示）。然后，比较随时间推移在这个基准测试上运行不同性能水平的语言模型的成本。</p>
+<p><img src="models-prices.png" alt="成本趋势预测" /></p>
+<p><em>在固定成本下，能力正在迅速提升。在固定能力水平下，成本正在迅速下降。由合著者Charles Frye使用2024年5月13日的公开数据创建。</em></p>
+<p>自OpenAI的davinci模型作为API推出以来的四年里，运行一个在该任务上具有同等性能的模型的成本（以一百万个token为规模，相当于本文档的大约一百份副本）已从20美元下降到不到10美分——每六个月就减半一次。同样，截至2024年5月，通过API提供商或自行运行Meta的LLama 3 8B的成本仅为每百万token 20美分，其性能与OpenAI的text-davinci-003相似，后者是使ChatGPT震惊世界的模型。该模型在2023年11月底发布时，每百万token的成本也约为20美元。这仅仅18个月就降低了两个数量级——在同样的时间框架内，摩尔定律预测的仅仅是翻倍。</p>
+<p>现在，让我们考虑一个非常有用但尚未经济实惠的LLM应用（为生成式视频游戏角色提供动力，类似于<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2304.03442">Park等人</a>的研究）。（他们的成本在<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2310.02172">这里</a>估计为每小时625美元。）自该论文于2023年8月发表以来，成本已经大约降低了一个数量级，降至每小时62.50美元。我们可以预期在接下来的九个月内，它可能会进一步降至每小时6.25美元。</p>
+<p>与此同时，当吃豆人（Pac-Man）在1980年发布时，按今天的货币价值计算，1美元可以买到一次游戏机会，足够玩几分钟或几十分钟——假设每小时可以玩六次游戏，相当于每小时6美元。这种粗略计算表明，一个引人入胜的LLM增强型游戏体验可能会在2025年左右变得经济实惠。</p>
+<p>这些趋势还很新，只有几年的历史。但几乎没有理由认为这一过程在未来几年会放缓。即使我们可能在算法和数据集层面难以突破<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup>，比如scaling已经超越了“Chinchilla比例”（每参数约20个token）<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup>，但数据中心和芯片技术的更深层次的创新和投资有望按此预测继续推进。</p>
+<p>而这或许是最重要的战略事实：今天完全不可行的底层技术演示或研究论文，几年后将成为高端功能，随后很快就会成为大众商品。我们应该以此为出发点来构建我们的系统和组织。</p>
+<h2 id="从0到1的演示够了现在是时候推出1到n的产品了"><a class="markdownIt-Anchor" href="#从0到1的演示够了现在是时候推出1到n的产品了"></a> 从0到1的演示够了，现在是时候推出1到N的产品了</h2>
+<p>We get it；搭建大型语言模型（LLM）演示确实很有趣。只需几行代码、一个向量数据库和精心设计的提示，我们就能创造出✨魔法✨。在过去的一年里，这种魔法被拿来与互联网、智能手机甚至印刷机相提并论。</p>
+<p>不幸的是，正如任何参与过实际软件开发的人所知，在受控环境下运行的演示与能够可靠大规模运行的产品之间存在着巨大的差距。</p>
+<p>以自动驾驶为例。第一辆由神经网络驱动的汽车出现在<a target="_blank" rel="noopener" href="https://proceedings.neurips.cc/paper/1988/file/812b4ba287f5ee0bc9d43bbf5bbe87fb-Paper.pdf">1988年</a>。二十五年后，Andrej Karpathy <a target="_blank" rel="noopener" href="https://x.com/karpathy/status/1689819017610227712">首次体验了Waymo的演示乘车</a>。又过了十年，该公司获得了<a target="_blank" rel="noopener" href="https://x.com/Waymo/status/1689809230293819392">无人驾驶许可</a>。从原型到商业产品，这花费了三十五年的严谨工程、测试、改进和监管协调。</p>
+<p>在过去的一年里，我们在工业和学术界的不同领域都敏锐地观察到了起起落落：这是LLM应用的第一年。我们希望我们所学到的经验教训 —— 从严谨的团队建设的操作技术等战术，到内部应构建哪些能力等战略视角 —— 能够在第二年及以后帮助到你们，因为我们都在共同构建这一激动人心的新技术。</p>
+<h2 id="关于作者"><a class="markdownIt-Anchor" href="#关于作者"></a> 关于作者</h2>
+<p><strong>Eugene Yan</strong> 设计、构建和运营为大规模客户服务的机器学习系统。他目前是亚马逊的高级应用科学家，在亚马逊他构建了服务于全球数百万客户的推荐系统<a target="_blank" rel="noopener" href="https://eugeneyan.com/speaking/recsys2022-keynote/">RecSys 2022主题演讲</a>，并应用LLM来更好地服务客户<a target="_blank" rel="noopener" href="https://eugeneyan.com/speaking/ai-eng-summit/">AI Eng Summit 2023主题演讲</a>。此前，他在Lazada（被阿里巴巴收购）和一家医疗科技 A 轮公司领导机器学习工作。他在<a target="_blank" rel="noopener" href="https://eugeneyan.com/">eugeneyan.com</a>和<a target="_blank" rel="noopener" href="https://applyingml.com/">ApplyingML.com</a>上撰写和讨论有关ML、RecSys、LLM和工程的内容。</p>
+<p><strong>Bryan Bischof</strong> 是 Hex 的 AI 负责人，他领导着一支工程师团队构建 Magic —— 一个数据科学和分析的Copilot应用。Bryan在数据相关技术栈的各个领域都有工作经验，领导过分析、机器学习工程、数据平台工程和AI工程团队。他在 Blue Bottle Coffee 创建了数据团队，在 Stitch Fix 领导了几个项目，并在 Weights and Biases 构建了数据团队。Bryan 此前与 O’Reilly 合著了《构建产品推荐系统》一书，并在罗格斯大学研究生院教授数据科学和分析。他的博士学位是纯数学。</p>
+<p><strong>Charles Frye</strong> 教人们构建AI应用。在发表了<a target="_blank" rel="noopener" href="https://pubmed.ncbi.nlm.nih.gov/24316346/">精神药理学</a>和<a target="_blank" rel="noopener" href="https://journals.physiology.org/doi/full/10.1152/jn.00172.2016">神经生物学</a>的研究成果后，他在加州大学伯克利分校获得了博士学位，研究方向为<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2003.10397">神经网络优化</a>。他已经教授了数千人 AI 应用开发的全栈知识，从线性代数基础到GPU的深奥知识，以及构建可防御的业务，并在Weights and Biases、<a target="_blank" rel="noopener" href="https://fullstackdeeplearning.com/">Full Stack Deep Learning</a> 和 Modal 从事教育和咨询工作。</p>
+<p><strong>Hamel Husain</strong> 是一位拥有超过25年<a target="_blank" rel="noopener" href="https://www.linkedin.com/in/hamelhusain/">经验</a>的机器学习工程师。他曾在 Airbnb 和 GitHub 等创新公司工作，其中包括一些<a target="_blank" rel="noopener" href="https://openai.com/index/introducing-text-and-code-embeddings/">早期的LLM研究</a>被 OpenAI 采用，用于代码理解。他还领导并贡献了许多流行的<a target="_blank" rel="noopener" href="https://hamel.dev/oss/opensource.html">开源机器学习工具</a>。Hamel 目前是一名<a target="_blank" rel="noopener" href="https://hamel.dev/hire.html">独立顾问</a>，帮助公司将大型语言模型（LLMs）投入运营，以加速他们的AI产品开发进程。</p>
+<p><strong>Jason Liu</strong> 是一位杰出的机器学习<a target="_blank" rel="noopener" href="https://jxnl.co/services/">顾问</a>，以领导团队成功交付AI产品而闻名。Jason 的技术专长涵盖个性化算法、搜索优化、合成数据生成和 MLOps 系统。他的经验包括在 Stitch Fix 等公司工作，在那里他创建了一个推荐框架和可观测性工具，每天处理3.5亿次请求。他还在Meta、纽约大学以及 Limitless AI 和 Trunk Tools 等初创公司担任过其他职务。</p>
+<p><strong>Shreya Shankar</strong> 是加州大学伯克利分校的机器学习工程师和计算机科学博士生。她是两家初创公司的第一位机器学习工程师，从零开始构建每日服务于数千用户的AI驱动产品。作为研究员，她的工作专注于通过以人为中心的方法解决生产环境中机器学习系统的数据挑战。她的研究成果已在VLDB、SIGMOD、CIDR和CSCW等顶级数据管理和人机交互会议上发表。</p>
+<h2 id="联系我们"><a class="markdownIt-Anchor" href="#联系我们"></a> 联系我们</h2>
+<p>我们非常希望收到您对这篇文章的想法。您可以通过 <a href="mailto:contact@applied-llms.org">contact@applied-llms.org</a> 与我们联系。我们中的许多人都愿意提供各种形式的咨询和建议。如果合适的话，我们会在您与我们联系后将您转介给相应的专家。</p>
+<h2 id="致谢"><a class="markdownIt-Anchor" href="#致谢"></a> 致谢</h2>
+<p>这个系列文章始于一次群聊中的对话，Bryan 开玩笑说他受到启发要写&quot;一年的 AI 工程&quot;。然后，✨魔法✨在群聊中发生了，我们都受到启发，决定一起贡献并分享我们迄今为止所学到的东西。</p>
+<p>作者们感谢 Eugene 领导了文档整合和整体结构的大部分工作，以及大部分课程内容。此外，还要感谢他承担主要编辑责任和文档方向。作者们感谢 Bryan 提供了促成这篇文章的灵感，将文章重组为战术、运营和战略部分及其介绍，并推动我们思考如何更好地接触和帮助社区。作者们感谢 Charles 对成本和 LLMOps 的深入探讨，以及将课程编织得更加连贯和紧凑 —— 你应该感谢他让这篇文章只有30页而不是40页！作者们感谢 Hamel 和 Jason 从客户咨询和前线工作中获得的洞见，从客户那里学到的广泛可推广的知识，以及对工具的深入了解。最后，感谢 Shreya 提醒我们评估和严格生产实践的重要性，并将她的研究和原创成果带入这篇文章。</p>
+<p>最后，作者们感谢所有在文章中慷慨分享挑战和经验教训的团队，我们在整个系列中都引用了这些内容，同时也感谢 AI 社区对本团队的积极参与和互动。</p>
+<p><img src="how-it-started.jpg" alt="缘起" /></p>
+<h2 id="译注"><a class="markdownIt-Anchor" href="#译注"></a> 译注</h2>
+<hr class="footnotes-sep" />
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p><em>let’s think step by step</em> 是大语言模型的经典提示词。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>PMF(Product Market Fit)产品市场契合度，指产品与市场需求之间的匹配程度。 <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn3" class="footnote-item"><p>DevOps 的灵感来自于精益制造和丰田生产系统。精益制造是一种让生产过程更高效的方法，而丰田生产系统是精益制造的一个很好的例子。丰田公司通过不断的小改进（Kaizen）和快速更换模具（Single Minute Exchange of Die）来提高生产效率。 <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn4" class="footnote-item"><p>Sparkle 图标 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="m196.2 132.81l-53.36-19.65l-19.65-53.36a11.93 11.93 0 0 0-22.38 0l-19.65 53.36l-53.36 19.65a11.93 11.93 0 0 0 0 22.38l53.36 19.65l19.65 53.36a11.93 11.93 0 0 0 22.38 0l19.65-53.36l53.36-19.65a11.93 11.93 0 0 0 0-22.38m-2.77 14.87L138.35 168a4 4 0 0 0-2.37 2.37l-20.3 55.08a3.92 3.92 0 0 1-7.36 0L88 170.35a4 4 0 0 0-2.35-2.35l-55.08-20.3a3.92 3.92 0 0 1 0-7.36L85.65 120a4 4 0 0 0 2.35-2.35l20.3-55.08a3.92 3.92 0 0 1 7.36 0L136 117.65a4 4 0 0 0 2.37 2.37l55.08 20.3a3.92 3.92 0 0 1 0 7.36ZM148 40a4 4 0 0 1 4-4h20V16a4 4 0 0 1 8 0v20h20a4 4 0 0 1 0 8h-20v20a4 4 0 0 1-8 0V44h-20a4 4 0 0 1-4-4m96 48a4 4 0 0 1-4 4h-12v12a4 4 0 0 1-8 0V92h-12a4 4 0 0 1 0-8h12V72a4 4 0 0 1 8 0v12h12a4 4 0 0 1 4 4"/></svg> ，有时是一个点亮火花的魔法棒或者是一个🌟状的icon。一些公司在推出所谓的“AI”功能时，会在产品上加上这个闪闪发光的图标，以吸引用户的注意力。 <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn5" class="footnote-item"><p>“Even as we perhaps use up low-hanging fruit in algorithms and datasets”, 原文是：尽管我们可能已用尽了算法和数据集上的低垂果实。译文采用意译。 <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn6" class="footnote-item"><p>Chinchilla 比例是指在自然语言处理（NLP）领域中 Chinchilla 模型在训练计算利用率方面的优化比例。具体来说，Chinchilla 模型通过优化参数数量和训练 tokens 的比例，实现了更高的计算效率和性能。Chinchilla 是一种小型啮齿动物，其体型较小。参考论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2203.15556">Training Compute-Optimal Large Language Models</a> <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+    </div>
+     
+    <div class="post-footer__meta"><p>updated at 2024-10-06</p></div> 
+    <div class="post-entry__tags"><a href="/tags/LLM/" class="post-tags__link button"># LLM</a><a href="/tags/Prompt-Engineering/" class="post-tags__link button"># Prompt Engineering</a><a href="/tags/RAG/" class="post-tags__link button"># RAG</a><a href="/tags/Pipeline/" class="post-tags__link button"># Pipeline</a><a href="/tags/Workflow/" class="post-tags__link button"># Workflow</a><a href="/tags/Agent/" class="post-tags__link button"># Agent</a><a href="/tags/Finetune/" class="post-tags__link button"># Finetune</a></div> 
+</article>
+
+
+    <div class="nav">
+        <div class="nav__prev">
+            
+        </div>
+        <div class="nav__next">
+            
+                <a href="/2024/10/05/building-with-llms-part-2/" class="nav__link">
+                    <div>
+                        <div class="nav__label">
+                            Next Post
+                        </div>
+                        <div class="nav__title">
+                            LLMs应用构建一年之心得（第二篇）
+                        </div>
+                    </div>
+                    <div>
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M434.944 790.624l-45.248-45.248L623.04 512l-233.376-233.376 45.248-45.248L713.568 512z" fill="#808080"></path></svg>
+                    </div>
+                </a>
+            
+        </div>
+    </div>
+
+
+
+    <div class="post__comments post__with-toc content-card" id="comment">
+        
+    <h4>Comments</h4>
+    
+    
+    
+    
+    
+    
+    <div id="gitalk-container"></div>
+
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    </div>
+
+
+
+</main>
+
+            <footer class="footer">
+    
+    
+
+
+    
+     
+ 
+
+ 
+    
+        
+        <p class="footer-copyright">
+            Copyright © 2024 <a href="/">Mustard Garden</a>
+        </p>
+    
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme - <a href="https://github.com/ChrAlpha/hexo-theme-cards" target="_blank">Cards</a></p>
+</footer>
+
+        </div>
+         
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+    
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+    
+
+    
+
+    
+    
+
+    
+    
+    
+    <script>
+        function loadComment() {
+            let e, i;
+            (e = document.createElement("script")).src = 'https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js',
+            document.body.appendChild(e);
+            e.onload = () => {
+                var gitalk = new Gitalk({
+                    clientID: 'Ov23li4E7d8QgDwEBA2W',
+                    clientSecret: 'df2965c35747b6d7697ee452d50f78b00f4c10f3',
+                    repo: 'mustart-gitalk',
+                    owner: 'IanGYan',
+                    admin: 'IanGYan',
+                    id: window.location.pathname,
+                    distractionFreeMode: false
+                });
+                gitalk.render('gitalk-container');
+            };
+            (i = document.createElement("link")).rel = "stylesheet",
+            i.href = 'https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css',
+            document.head.appendChild(i);
+        }
+    
+        var runningOnBrowser = typeof window !== "undefined";
+        var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro|msn)bot|crawl|spider|yand|duckgo/i.test(navigator.userAgent);
+        var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
+    
+        setTimeout(function () {
+            if (!isBot && supportsIntersectionObserver) {
+                var comment_observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        loadComment();
+                        comment_observer.disconnect();
+                    }
+                }, { threshold: [0] });
+                comment_observer.observe(document.getElementById('comment'));
+            } else {
+                loadComment();
+            }
+        }, 1);
+    </script>
+
+    
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+
+
+
+    </body>
+</html>
