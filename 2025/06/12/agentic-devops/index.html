@@ -55,7 +55,7 @@
 <meta property="og:image" content="https://iangyan.github.io/2025/06/12/agentic-devops/devops-process.png">
 <meta property="og:image" content="https://iangyan.github.io/2025/06/12/agentic-devops/Scrum-process.png">
 <meta property="article:published_time" content="2025-06-12T15:49:14.654Z">
-<meta property="article:modified_time" content="2025-06-14T13:34:26.190Z">
+<meta property="article:modified_time" content="2025-06-15T00:44:19.083Z">
 <meta property="article:author" content="ian">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="Agentic AI">
@@ -311,12 +311,12 @@
 <p>需要指出的是，AI 不仅仅有 LLM，LLM 也未必代表未来 AI 的主流。AI 的发展非常快，且经常会有颠覆性。当前，由于 LLM 是体现了最强智能的模型体系，因此成为首选。未来可能会有其他架构体系的模型取代其地位。</p>
 <p>例如，液态神经网络目前因其独特的动态适应能力而备受关注。液态神经网络能在运行时持续学习并适应新数据流，展现出类脑的灵活性与环境交互能力。研究证实，这种生物启发算法在实时性、能效比及小样本学习等关键指标上均超越主流深度学习方案。除此之外，RetNet，RWKV，Mamba，UniRepLKNet，StripedHyena，等各种新的神经网络架构不断地在寻找突破的机遇。</p>
 <p>或许某一天，新的模型架构体系会颠覆现有 Transformer 一统天下的格局。随之而来的是：构建了人类社会中&quot;虚拟世界&quot;的基础组件 —— 代码，也会进一步更快速地发生更剧烈的蜕变。</p>
-<p>回到关于这篇文章的内容 —— Agentic DevOps 是一套依托 Agentic AI 的 DevOps 过程方法。</p>
+<p>回到这篇文章的话题 —— Agentic DevOps 是一套依托 Agentic AI 的 DevOps 过程方法。</p>
 <p>这套方法<strong>不仅仅局限于 AI Coding</strong>。站在软件过程方法的角度，我们需要思考的是：除了 Coding 这个环节，软件过程实际上包含了软件开发的整个生命周期，从需求探索、设计、编码构建、测试、集成、部署，到运营、监控、维护，这个过程中，Agentic AI 是否能够发挥更大的作用，从而帮助人类（现在的程序员）获得更高的开发效率，得到更高质量的、更鲁棒的、可维护的最终产物或产品？</p>
 <p>这些思考中的实践就是这篇文章的全部内容。</p>
 <h3 id="05-我为什么写这篇文章"><a class="markdownIt-Anchor" href="#05-我为什么写这篇文章"></a> 0.5 我为什么写这篇文章？</h3>
 <p>既然，我认为&quot;程序员&quot;终将消亡，为什么我还需要写这篇文章去探索<strong>程序员的</strong>软件开发之路？</p>
-<p>很显然，当下的程序员依然需要更好地掌握 AI 工具来提升自己的能力，从而在这场惨烈的生存竞争中活下去，然后，蜕变其角色获得新生。虽然可能 AI 最终要取代程序员，但如果不向 AI “对齐”，当下就会立即被&quot;掌握 AI 技能的程序员&quot;取代。因此，这篇文章是写给当下的程序员的。</p>
+<p>很显然，当下的程序员依然需要更好地掌握 AI 工具来提升自己的能力，从而在这场惨烈的生存竞争中活下去，然后，蜕变其角色获得新生。虽然可能 AI 最终要取代程序员，但如果不向 AI “对齐”，当下就会立即被&quot;掌握 AI 的程序员&quot;取代。因此，这篇文章是写给当下的程序员的。</p>
 <p>其次，“未来人人都是程序员&quot;的前提是人人都能借助 AI 的能力去成为&quot;程序员”，那么，更好地探索利用 AI 的能力也就是&quot;未来程序员&quot;都需要掌握的<strong>必备</strong>技能。因此，这篇文章也是写给&quot;未来的程序员&quot;的。</p>
 <p>实际上，我依然相信，未来一定有一部分<strong>专业的</strong>程序员存在（未必以编码为生，不一定是&quot;职业的&quot;，但是是&quot;专业的&quot;），他们热爱代码的世界，并富有更强大的创造能力，他们不仅具有深厚的技术积累，也可以熟练地操控 AI, 甚至掌控 AI。他们会是我眼中的&quot;超级个体&quot;。</p>
 <h2 id="第-1-章-探索之路"><a class="markdownIt-Anchor" href="#第-1-章-探索之路"></a> 第 1 章、探索之路</h2>
@@ -510,8 +510,8 @@
 <li>
 <p><strong>自主性水平（Level of Autonomy）</strong>：这是最核心的区别。</p>
 <ul>
-<li><strong>编码辅助工具</strong>：这类工具是&quot;人在回路&quot;（Human-in-the-loop）的设计，人类开发者是绝对的核心和主导者（Agent）。AI 的角色是辅助，它通过代码补全、函数生成、解释代码等方式，在开发者每一个细微的操作步骤中提供支持。</li>
-<li><strong>AI 工程师</strong>：这类工具是&quot;人在环上&quot;（Human-on-the-loop）甚至&quot;人离回路&quot;（Human-out-of-the-loop）的设计，AI 自身成为了主导者（Agent）。它被赋予一个高层级的目标（例如一个功能需求或一个 Bug 报告），然后自主地进行任务分解、规划、编码、测试和调试。</li>
+<li><strong>编码辅助工具</strong>：这类工具是&quot;人在回路&quot;（Human-in-the-loop）的设计，人类开发者是绝对的核心和主导者。AI 的角色是辅助，它通过代码补全、函数生成、解释代码等方式，在开发者每一个细微的操作步骤中提供支持。</li>
+<li><strong>AI 工程师</strong>：这类工具是&quot;人在环上&quot;（Human-on-the-loop）甚至&quot;人离回路&quot;（Human-out-of-the-loop）的设计，AI 自身成为了主导者。它被赋予一个高层级的目标（例如一个功能需求或一个 Bug 报告），然后自主地进行任务分解、规划、编码、测试和调试。</li>
 </ul>
 </li>
 <li>
@@ -1712,7 +1712,7 @@ June 8, 2025</p>
 
     </div>
      
-    <div class="post-footer__meta"><p>更新于 2025-06-14</p></div> 
+    <div class="post-footer__meta"><p>更新于 2025-06-15</p></div> 
     <div class="post-entry__tags"><a href="/tags/AI/" class="post-tags__link button"># AI</a><a href="/tags/Agentic-AI/" class="post-tags__link button"># Agentic AI</a><a href="/tags/DevOps/" class="post-tags__link button"># DevOps</a><a href="/tags/Software-Process/" class="post-tags__link button"># Software Process</a><a href="/tags/Vibe-Coding/" class="post-tags__link button"># Vibe Coding</a><a href="/tags/Agile/" class="post-tags__link button"># Agile</a></div> 
 </article>
 
