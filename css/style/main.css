@@ -1,12 +1,12 @@
 :root {
   --main-color: #6200ee;
-  --bg-color: #f4f4f4;
+  --bg-color: #e5e4e2;
   --bg-content-color: #fff;
   --bg-menu: #eceef2;
   --bg-tag-color: #f4f4f4;
   --bg-code: #eee;
   --bg-codeblock: #f8f8f8;
-  --body-color: #4c4d4e;
+  --body-color: #343434;
   --title-color: #50596c;
   --border-color: rgba(0,0,0,0.1);
   --space: 3.5rem;
@@ -856,12 +856,13 @@ overflows table td {
 }
 .cover .cover__avatar {
   border-radius: 50%;
-  width: 96px;
-  height: 96px;
+  width: 248px;
+  height: 248px;
   margin: 0 auto 1rem auto;
 }
 .cover .cover__intro {
-  color: #999;
+  color: $color-p;
+  font-size: 1.6rem;
 }
 .footer {
   display: block;
